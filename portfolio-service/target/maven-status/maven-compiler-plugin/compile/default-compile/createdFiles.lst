@@ -1,0 +1,5 @@
+com/marko/investment/portfolio/domain/Investment.class
+com/marko/investment/portfolio/domain/CashFlowType.class
+com/marko/investment/portfolio/domain/Portfolio.class
+com/marko/investment/portfolio/PortfolioServiceApplication.class
+com/marko/investment/portfolio/domain/CashFlow.class
