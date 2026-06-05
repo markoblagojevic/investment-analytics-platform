@@ -2,7 +2,15 @@ package com.marko.investment.portfolio.domain;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "investments")
 public class Investment {
@@ -18,29 +26,6 @@ public class Investment {
     private Portfolio portfolio;
 
 
-    public Investment() {
-    }
 
-    public Investment(Long id, String name, String assetClass, Portfolio portfolio) {
-        this.id = id;
-        this.name = name;
-        this.assetClass = assetClass;
-        this.portfolio = portfolio;
-    }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getAssetClass() {
-        return assetClass;
-    }
-
-    public Portfolio getPortfolio() {
-        return portfolio;
-    }
 }

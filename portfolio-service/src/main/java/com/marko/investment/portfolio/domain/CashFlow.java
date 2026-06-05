@@ -1,10 +1,17 @@
 package com.marko.investment.portfolio.domain;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "cash_flows")
 public class CashFlow {
@@ -22,38 +29,5 @@ public class CashFlow {
     @JoinColumn(name = "investment_id")
     private Investment investment;
 
-    public CashFlow() {
-    }
 
-    public CashFlow(Long id,
-                    BigDecimal amount,
-                    LocalDate date,
-                    CashFlowType type,
-                    Investment investment) {
-        this.id = id;
-        this.amount = amount;
-        this.date = date;
-        this.type = type;
-        this.investment = investment;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public CashFlowType getType() {
-        return type;
-    }
-
-    public Investment getInvestment() {
-        return investment;
-    }
 }
