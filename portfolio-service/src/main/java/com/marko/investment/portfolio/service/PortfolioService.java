@@ -17,6 +17,7 @@ public class PortfolioService {
     private final PortfolioRepository portfolioRepository;
     private final PortfolioMapper portfolioMapper;
 
+
     public List<PortfolioResponse> findAll() {
         return portfolioRepository.findAll()
                 .stream()

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package calculation;
+
+option java_package = "com.marko.investment.proto";
+option java_multiple_files = true;
+
+service CalculationService {
+  rpc CalculatePerformance (PerformanceRequest)
+      returns (PerformanceResponse);
+}
+
+message PerformanceRequest {
+  int64 portfolioId = 1;
+  repeated CashFlowMessage cashFlows = 2;
+}
+
+message CashFlowMessage {
+  string amount = 1;
+  string type = 2;
+}
+
+message PerformanceResponse {
+  int64 portfolioId = 1;
+  string totalContributions = 2;
+  string totalDistributions = 3;
+  string currentNav = 4;
+  string profit = 5;
+  string simpleReturn = 6;
+}

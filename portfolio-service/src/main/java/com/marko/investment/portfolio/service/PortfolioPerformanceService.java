@@ -3,7 +3,11 @@ package com.marko.investment.portfolio.service;
 import com.marko.investment.portfolio.domain.CashFlow;
 import com.marko.investment.portfolio.domain.CashFlowType;
 import com.marko.investment.portfolio.dto.PortfolioPerformanceResponse;
+import com.marko.investment.portfolio.grpc.CalculationGrpcClient;
 import com.marko.investment.portfolio.repository.CashFlowRepository;
+import com.marko.investment.proto.CashFlowMessage;
+import com.marko.investment.proto.PerformanceRequest;
+import com.marko.investment.proto.PerformanceResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,57 +21,35 @@ public class PortfolioPerformanceService {
 
     private final CashFlowRepository cashFlowRepository;
 
+    private final CalculationGrpcClient calculationGrpcClient;
     public PortfolioPerformanceResponse calculate(Long portfolioId) {
 
         List<CashFlow> cashFlows =
                 cashFlowRepository.findByInvestmentPortfolioId(portfolioId);
 
-        BigDecimal totalContributions = sumByType(
-                cashFlows,
-                CashFlowType.CONTRIBUTION
+        PerformanceRequest.Builder requestBuilder =
+                PerformanceRequest.newBuilder()
+                        .setPortfolioId(portfolioId);
+
+        cashFlows.forEach(cashFlow ->
+                requestBuilder.addCashFlows(
+                        CashFlowMessage.newBuilder()
+                                .setAmount(cashFlow.getAmount().toString())
+                                .setType(cashFlow.getType().name())
+                                .build()
+                )
         );
 
-        BigDecimal totalDistributions = sumByType(
-                cashFlows,
-                CashFlowType.DISTRIBUTION
-        );
-
-        BigDecimal currentNav = sumByType(
-                cashFlows,
-                CashFlowType.NAV
-        );
-
-        BigDecimal profit = totalDistributions
-                .add(currentNav)
-                .subtract(totalContributions);
-
-        BigDecimal simpleReturn = BigDecimal.ZERO;
-
-        if (totalContributions.compareTo(BigDecimal.ZERO) > 0) {
-            simpleReturn = profit.divide(
-                    totalContributions,
-                    4,
-                    RoundingMode.HALF_UP
-            );
-        }
+        PerformanceResponse response =
+                calculationGrpcClient.calculatePerformance(requestBuilder.build());
 
         return new PortfolioPerformanceResponse(
-                portfolioId,
-                totalContributions,
-                totalDistributions,
-                currentNav,
-                profit,
-                simpleReturn
+                response.getPortfolioId(),
+                new BigDecimal(response.getTotalContributions()),
+                new BigDecimal(response.getTotalDistributions()),
+                new BigDecimal(response.getCurrentNav()),
+                new BigDecimal(response.getProfit()),
+                new BigDecimal(response.getSimpleReturn())
         );
     }
-
-    private BigDecimal sumByType(
-            List<CashFlow> cashFlows,
-            CashFlowType type) {
-
-        return cashFlows.stream()
-                .filter(cashFlow -> cashFlow.getType() == type)
-                .map(CashFlow::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-}
