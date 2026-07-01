@@ -9,11 +9,14 @@ import com.marko.investment.portfolio.mapper.CashFlowMapper;
 import com.marko.investment.portfolio.repository.CashFlowRepository;
 import com.marko.investment.portfolio.repository.InvestmentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class CashFlowService {
+
+    private final StringRedisTemplate redisTemplate;
 
     private final CashFlowRepository cashFlowRepository;
     private final InvestmentRepository investmentRepository;
@@ -29,6 +32,18 @@ public class CashFlowService {
         CashFlow cashFlow = cashFlowMapper.toEntity(request, investment);
 
         CashFlow savedCashFlow = cashFlowRepository.save(cashFlow);
+
+        Long portfolioId =
+                investment.getPortfolio().getId();
+
+        String cacheKey =
+                "portfolio:performance:" + portfolioId;
+
+
+
+        redisTemplate.delete(cacheKey);
+
+
 
         return cashFlowMapper.toResponse(savedCashFlow);
     }
